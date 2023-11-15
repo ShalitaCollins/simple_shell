@@ -7,11 +7,17 @@
  * Return: 0
  */
 
-int main(void)
+int main(int f, char **argv)
 {
-	char *prompt = "(myshell)>$ ", *buffer;
+	(void)f;
+
+	char *prompt = "(myshell)>$ ", *buffer, *cpy_buff, *token;
 	size_t size = 0;
         ssize_t num_chars;
+	const char *delim = " \n";
+	int num_tokens = 0; 
+	int i;
+
 	while(1)
 	{
 	printf("%s", prompt);
@@ -23,8 +29,41 @@ int main(void)
 	  printf("Exit (myshell)> $ ....\n");
           return (-1);
 	}	  
-	printf("%s\n", buffer);
+	cpy_buff = malloc(sizeof(char) * num_chars);
+        if (cpy_buff == NULL)
+	{
+	perror("Memory allocation failed\n");
+        return (-1);
+        }	
+        
+        strcpy(cpy_buff, buffer); 
+        
+        token = strtok(buffer, delim);
+        
+        while(token != NULL)
+	{
+	  num_tokens++;
+          token = strtok(NULL, delim);	  
+	}		
+          num_tokens++;
+
+        argv = malloc(sizeof(char *)* num_tokens);
+
+	token = strtok(cpy_buff, delim);
+	for (i = 0; token != NULL; i++)
+	{
+	argv[i] = malloc(sizeof(char) * strlen(token));
+	strcpy(argv[i], token);
+
+	token = strtok(NULL, delim);
+	
+        printf("%s\n", argv[i]);	
 	}
+
+	// printf("%s\n", buffer);
+	}
+	free(cpy_buff);
+	free(argv);
         free(buffer);
 		
 	return (0);
